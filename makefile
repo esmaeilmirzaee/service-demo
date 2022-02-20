@@ -25,19 +25,32 @@ service:
 # ------------------------------------------------------------
 # Running from within k8s/kind
 
-KIND_CLUSTER := ardan-starter-cluster
+KIND_CLUSTER := thebeaver-starter-cluster
 
 kind-up:
 	kind create cluster \
-		--name kindest/node:v1.21
-		.1@sha256
-		:32b8b755dee8d5fc6dbafef80898e7f2e450655f45f4b59cca3f7f57e9278c3b \
+		--name kindest/node@sha256:32b8b755dee8d5fc6dbafef80898e7f2e450655f45f4b59cca3f7f57e9278c3b \
 		--name $(KIND_CLUSTER) \
 		--config zarf/k8s/kind/kind-config.yaml
 
 kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
+kind-load:
+	kind load docker-image service-amd64:$(version) --name $(KIND_CLUSTER)
+
+kind-apply:
+	kustomize build zarf/k8s/base/service-pod/base-service.yaml | kubectl apply
+	-f -
+
 kind-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
+	kubectl get pods -o wide --watch --all-namespaces
+
+kind-logs:
+	kubectl logs -l app=service --all-containers=true -f --tail=100
+	--namespace=service-system
+
+kind-restart:
+	kubectl rollout restart deployment service-pod --namespace=service-system
