@@ -17,7 +17,7 @@ all: service
 service:
 	docker build \
 		-f zarf/dockerfile \
-		-t service-demo-amd64:$(VERSION)
-		--build-arg BUILD_REF=$(VERSION)
-		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"`
+		-t service-demo-amd64:$(VERSION) \
+		--build-arg BUILD_REF=$(VERSION) \
+		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
