@@ -17,7 +17,7 @@ all: service
 service:
 	docker build \
 		-f zarf/docker/dockerfile \
-		-t service-demo-amd64:$(VERSION) \
+		-t service-amd64:$(VERSION) \
 		--build-arg BUILD_REF=$(VERSION) \
 		--build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
 		.
@@ -47,6 +47,9 @@ kind-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
 	kubectl get pods -o wide --watch --all-namespaces
+
+kind-status-service:
+	kubectl get pods -o wide --watch --namespace=service-system
 
 kind-logs:
 	kubectl logs -l app=service --all-containers=true -f --tail=100
