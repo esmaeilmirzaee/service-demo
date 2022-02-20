@@ -11,16 +11,16 @@ WORKDIR /service
 RUN go build -ldflags "-X main.build=${BUILD_REF}"
 
 # Run the Go binary in Alpine linux.
-FROM alpine:3.15
+FROM alpine:3.15 as alpine-service-build
 ARG BUILD_DATE
 ARG BUILD_REF
 COPY --from=build_sales-api /service/service /service/service
 
 WORKDIR /service
-CMD ["./service-demo"]
+CMD ["./service"]
 
 LABEL org.opencontainer.image.created="${BUILD_DATE}" \
-      org.opencontainer.image.title="service-demo" \
+      org.opencontainer.image.title="service" \
       org.opencontainer.image.authors="Esmaeil MIRZAEE <esmaeilmirzaeeATgmailDOTcom>" \
       org.opencontainer.image.source="https://github.com/esmaeilmirzaee/service-demo" \
       org.opencontainer.image.revision="${BUILD_REF}" \
