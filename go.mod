@@ -1,4 +1,4 @@
-module github.com/esmaeilmirzaee/service-demo
+module github.com/esmaeilmirzaee/service
 
 go 1.17
 
