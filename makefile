@@ -39,7 +39,7 @@ kind-down:
 	kind delete cluster --name $(KIND_CLUSTER)
 
 kind-load:
-	kind load docker-image service-amd64:$(version) --name $(KIND_CLUSTER)
+	kind load docker-image service-amd64:$(VERSION) --name $(KIND_CLUSTER)
 
 kind-apply:
 	kustomize build zarf/k8s/base/service-pod/base-service.yaml | kubectl apply
