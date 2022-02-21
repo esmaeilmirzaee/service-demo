@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 )
 
@@ -11,7 +12,9 @@ import (
 var build = "develop"
 
 func main() {
-	log.Println("starting service", build)
+	// how many CPU cores would be run in parallel
+	g := runtime.GOMAXPROCS(0)
+	log.Printf("starting service %q CPUS {%d}", build, g)
 	defer log.Println("service ended")
 
 	shutdown := make(chan os.Signal, 1)
