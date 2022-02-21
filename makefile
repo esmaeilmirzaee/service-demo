@@ -43,7 +43,7 @@ kind-load:
 	kind load docker-image service-amd64:$(VERSION) --name $(KIND_CLUSTER)
 
 kind-apply:
-	cat zarf/base/service-pod/base-service.yaml | kubectl apply -f -
+	kustomize build zarf/k8s/kind/service-pod | kubectl apply -f -
 
 kind-status:
 	kubectl get nodes -o wide
@@ -56,12 +56,12 @@ kind-status-service:
 kind-logs:
 	kubectl logs -l app=service --all-containers=true -f --tail=100
 
-
 kind-restart:
 	kubectl rollout restart deployment service-pod
 
 kind-update: all kind-load kind-restart
 
+kind-update-apply: all kind-load kind-apply
 
 kind-describe:
 	kubectl describe pod -l app=service
