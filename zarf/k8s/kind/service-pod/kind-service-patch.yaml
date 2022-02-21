@@ -19,6 +19,6 @@ spec:
         - name: service-api
           resources:
             limits:
-              cpu: "2000m" # up to 2 full cores
+              cpu: "1000m" # up to 2 full cores
             requests:
               cpu: "1000m" # use 1 full core
