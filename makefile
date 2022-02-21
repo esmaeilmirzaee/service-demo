@@ -32,6 +32,7 @@ kind-up:
 		--name kindest/node@sha256:32b8b755dee8d5fc6dbafef80898e7f2e450655f45f4b59cca3f7f57e9278c3b \
 		--name $(KIND_CLUSTER) \
 		--config zarf/k8s/kind/kind-config.yaml
+
 	# default namespace
 	kubectl config set-context --current --namespace=service-system
 
@@ -42,13 +43,12 @@ kind-load:
 	kind load docker-image service-amd64:$(VERSION) --name $(KIND_CLUSTER)
 
 kind-apply:
-	kustomize build zarf/k8s/base/service-pod/base-service.yaml | kubectl apply
-	-f -
+	kustomize build zarf/base/service-pod/base-service.yaml | kubectl apply -f -
 
 kind-status:
 	kubectl get nodes -o wide
 	kubectl get svc -o wide
-	kubectl get pods -o wide --watch
+	kubectl get pods -o wide --watch --all-namespaces
 
 kind-status-service:
 	kubectl get pods -o wide --watch
