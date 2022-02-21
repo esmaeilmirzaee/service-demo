@@ -6,6 +6,10 @@ run:
 build:
 	go build -ldflags "-X main.build=local"
 
+tidy:
+	go mod tidy
+	go mod vendor
+
 # ++++++++++++++++++++++++++++++++++++++++++++++++++++
 # Building container
 
