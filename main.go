@@ -8,16 +8,16 @@ import (
 	"os/signal"
 	"runtime"
 	"syscall"
-
-	_ "go.uber.org/automaxprocs/maxprocs"
 )
 
 //
 var build = "develop"
 
 func main() {
+	// Set the correct number of threads for the service
+	// based on what is available either by the machine or quote.
 	if _, err := maxprocs.Set(); err != nil {
-		fmt.Println("maxprocs %w", err)
+		fmt.Println("maxprocs: %w", err)
 		os.Exit(1)
 	}
 
