@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"go.uber.org/automaxprocs/maxprocs"
 	"log"
 	"os"
 	"os/signal"
 	"runtime"
 	"syscall"
+
+	"go.uber.org/automaxprocs/maxprocs"
 )
 
 //
@@ -16,9 +17,7 @@ var build = "develop"
 func main() {
 	// Set the correct number of threads for the service
 	// based on what is available either by the machine or quote.
-	undo, err := maxprocs.Set(maxprocs.Logger(log.Printf))
-	defer undo()
-	if err != nil {
+	if _, err := maxprocs.Set(maxprocs.Logger(log.Printf)); err != nil {
 		fmt.Println("maxprocs: %w", err)
 		os.Exit(1)
 	}
