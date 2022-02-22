@@ -2,35 +2,56 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"os"
-	"os/signal"
-	"runtime"
-	"syscall"
-
-	"go.uber.org/automaxprocs/maxprocs"
 )
 
 //
 var build = "develop"
 
 func main() {
-	// Set the correct number of threads for the service
-	// based on what is available either by the machine or quote.
-	if _, err := maxprocs.Set(maxprocs.Logger(log.Printf)); err != nil {
-		fmt.Println("maxprocs: %w", err)
+	log, err := initLogger("SALES-API")
+	if err != nil {
+		fmt.Println("Error constructing logger", err)
 		os.Exit(1)
 	}
 
-	// how many CPU cores would be run in parallel
-	g := runtime.GOMAXPROCS(0)
+	defer func(log *zap.SugaredLogger) {
+		err := log.Sync()
+		if err != nil {
+			log.Errorw("deferring logger", "ERROR", err)
+			os.Exit(1)
+		}
+	}(log)
 
-	log.Printf("starting service %q CPUS {%d}", build, g)
-	defer log.Println("service ended")
+	// Perform the startup and shutdown sequence
+	if err := run(log); err != nil {
+		log.Errorw("startup", "ERROR", err)
+		os.Exit(1)
+	}
+}
 
-	shutdown := make(chan os.Signal, 1)
-	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
-	<-shutdown
+func run(log *zap.SugaredLogger) error {
 
-	log.Println("stopping services")
+	return nil
+}
+
+func initLogger(service string) (*zap.SugaredLogger, error) {
+	// Construct the application human-readable logger.
+	config := zap.NewProductionConfig()
+	config.OutputPaths = []string{"stdout"}
+	config.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+	config.DisableStacktrace = true
+	config.InitialFields = map[string]interface{}{
+		"service": "SALES-API",
+	}
+
+	log,err:=config.Build()
+	if err!= nil {
+		return nil, err
+	}
+
+
+	return log.Sugar(), nil
 }
