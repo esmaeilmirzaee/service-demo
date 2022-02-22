@@ -1,13 +1,22 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"go.uber.org/automaxprocs/maxprocs"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
+	"runtime"
+	"time"
+
+	"github.com/ardanlabs/conf"
 )
 
-//
+/*
+TODO: Need to figure out timeouts for http service
+ */
+
 var build = "develop"
 
 func main() {
@@ -33,7 +42,59 @@ func main() {
 }
 
 func run(log *zap.SugaredLogger) error {
+	// ====================================================
+	// GOMAXPROXS
 
+	// Set the correct number of threads for the service
+	// based on what is available either by the machine or quotes
+	undo, err := maxprocs.Set()
+	defer undo()
+	if err!= nil {
+		return fmt.Errorf("maxprcs: %w", err)
+	}
+	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
+
+	// ====================================================
+	// configuration
+
+	cfg := struct{
+		conf.Version
+		Web struct{
+			APIHost		string `conf:"default:0.0.0.0:1337"`
+			DebugHost	string `conf:"default:0.0.0.0:1338"`
+			ReadTimeout	time.Duration	`conf:"default:5s"`
+			WriteTimeout	time.Duration `conf:"default:10s"`
+			IdleTimeout		time.Duration	`conf:"default:120s"`
+			ShutdownTimeout	time.Duration	`conf:"default:20s"`
+		}
+	}{
+		Version: conf.Version{
+			SVN: build,
+			Desc: "copyright information here",
+		},
+	}
+
+	const prefix = "SALES"
+	help, err := conf.ParseOSArgs(prefix, &cfg)
+	if err != nil {
+		if errors.Is(err, conf.ErrHelpWanted) {
+			fmt.Println(help)
+			return nil
+		}
+		return fmt.Errorf("parsing config %w", err)
+	}
+
+	// ==========================================================
+	// App starting
+	log.Infow("Starting service", "version", build)
+	defer log.Infow("shutdown complete")
+
+	out, err := conf.String(&cfg)
+	if err != nil {
+		return fmt.Errorf("generating config for output: %w", err)
+	}
+	log.Infow("startup", "config", out)
+	
 	return nil
 }
 
