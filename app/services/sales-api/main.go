@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"expvar"
 	"fmt"
 	"github.com/esmaeilmirzaee/service/app/services/sales-api/handlers"
 	"go.uber.org/automaxprocs/maxprocs"
@@ -19,7 +20,7 @@ import (
 
 /*
 TODO: Need to figure out timeouts for http service
- */
+*/
 
 var build = "develop"
 
@@ -53,7 +54,7 @@ func run(log *zap.SugaredLogger) error {
 	// based on what is available either by the machine or quotes
 	undo, err := maxprocs.Set()
 	defer undo()
-	if err!= nil {
+	if err != nil {
 		return fmt.Errorf("maxprcs: %w", err)
 	}
 	log.Infow("startup", "GOMAXPROCS", runtime.GOMAXPROCS(0))
@@ -61,19 +62,19 @@ func run(log *zap.SugaredLogger) error {
 	// ====================================================
 	// configuration
 
-	cfg := struct{
+	cfg := struct {
 		conf.Version
-		Web struct{
-			APIHost		string `conf:"default:0.0.0.0:1337"`
-			DebugHost	string `conf:"default:0.0.0.0:1338"`
-			ReadTimeout	time.Duration	`conf:"default:5s"`
-			WriteTimeout	time.Duration `conf:"default:10s"`
-			IdleTimeout		time.Duration	`conf:"default:120s"`
-			ShutdownTimeout	time.Duration	`conf:"default:20s"`
+		Web struct {
+			APIHost         string        `conf:"default:0.0.0.0:1337"`
+			DebugHost       string        `conf:"default:0.0.0.0:1338"`
+			ReadTimeout     time.Duration `conf:"default:5s"`
+			WriteTimeout    time.Duration `conf:"default:10s"`
+			IdleTimeout     time.Duration `conf:"default:120s"`
+			ShutdownTimeout time.Duration `conf:"default:20s"`
 		}
 	}{
 		Version: conf.Version{
-			SVN: build,
+			SVN:  build,
 			Desc: "copyright information here",
 		},
 	}
@@ -98,6 +99,9 @@ func run(log *zap.SugaredLogger) error {
 		return fmt.Errorf("generating config for output: %w", err)
 	}
 	log.Infow("startup", "config", out)
+
+	// Display cmd information
+	expvar.NewString("build").Set(build)
 
 	// ==========================================================
 	// Start Debug Service
@@ -138,11 +142,10 @@ func initLogger(service string) (*zap.SugaredLogger, error) {
 		"service": "SALES-API",
 	}
 
-	log,err:=config.Build()
-	if err!= nil {
+	log, err := config.Build()
+	if err != nil {
 		return nil, err
 	}
-
 
 	return log.Sugar(), nil
 }

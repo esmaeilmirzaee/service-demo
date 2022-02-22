@@ -1,5 +1,10 @@
 SHELL := ${SHELL}
 
+# =================================================================
+# Testing against the running system
+# expvarmon -ports=":1338" -vars="build,requests,goroutines,errors,panics,mem:memstats.Alloc"
+
+# =================================================================
 run:
 	go run app/services/sales-api/main.go | go run app/tooling/logfmt/main.go
 
