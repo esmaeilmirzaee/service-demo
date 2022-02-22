@@ -20,7 +20,7 @@ WORKDIR /service
 CMD ["./sales-api"]
 
 LABEL org.opencontainer.image.created="${BUILD_DATE}" \
-      org.opencontainer.image.title="service" \
+      org.opencontainer.image.title="sales-api" \
       org.opencontainer.image.authors="Esmaeil MIRZAEE <esmaeilmirzaeeATgmailDOTcom>" \
       org.opencontainer.image.source="https://github.com/esmaeilmirzaee/service-demo" \
       org.opencontainer.image.revision="${BUILD_REF}" \
