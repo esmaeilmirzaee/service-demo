@@ -1,1 +1,30 @@
+# binaries of programs and plugins
+app/services/sales-api/sales-api
+
+# editor files
 .idea/
+*.iml
+*.swp
+
+# compiled object files
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.o
+*.a
+*.so
+
+# Mac
+.DS_Store
+
+# backup files
+*~*
+
+# test binary, built with `go test -c`
+*.test
+
+# output of the go coverage tool specifically when used with LiteIDE
+*.out
+

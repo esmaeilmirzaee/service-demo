@@ -32,5 +32,5 @@ func main() {
 	signal.Notify(shutdown, syscall.SIGINT, syscall.SIGTERM)
 	<-shutdown
 
-	log.Println("stopping servicea")
+	log.Println("stopping services")
 }
